@@ -2019,6 +2019,10 @@ Process.prototype.reportQuotient = function (a, b) {
     return +a / +b;
 };
 
+Process.prototype.reportExponent = function (a, b) {
+	return Math.pow(a,b);
+};
+
 Process.prototype.reportModulus = function (a, b) {
     var x = +a,
         y = +b;

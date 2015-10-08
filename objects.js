@@ -932,6 +932,11 @@ SpriteMorph.prototype.initBlocks = function () {
             spec: '%n \u00D7 %n',
             alias: '*'
         },
+        reportExponent: {
+        	type: 'reporter',
+        	category: 'operators',
+        	spec: '%n ^ %n',
+        },
         reportQuotient: {
             type: 'reporter',
             category: 'operators',
@@ -1295,10 +1300,11 @@ SpriteMorph.prototype.blockAlternatives = {
     reportMouseY: ['reportMouseX'],
 
     // operators:
-    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient'],
+    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient','reportExponent'],
     reportDifference: ['reportSum', 'reportProduct', 'reportQuotient'],
-    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient'],
+    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient','reportExponent'],
     reportQuotient: ['reportDifference', 'reportProduct', 'reportSum'],
+    reportExponent: ['reportSum','reportProduct'],
     reportLessThan: ['reportEquals', 'reportGreaterThan'],
     reportEquals: ['reportLessThan', 'reportGreaterThan'],
     reportGreaterThan: ['reportEquals', 'reportLessThan'],
@@ -1980,6 +1986,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
+        blocks.push(block('reportExponent'));
         blocks.push('-');
         blocks.push(block('reportModulus'));
         blocks.push(block('reportRound'));
@@ -5512,6 +5519,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
+        blocks.push(block('reportExponent'));
         blocks.push('-');
         blocks.push(block('reportModulus'));
         blocks.push(block('reportRound'));
