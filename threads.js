@@ -2025,6 +2025,13 @@ Process.prototype.reportModulus = function (a, b) {
     return ((x % y) + y) % y;
 };
 
+/JUST ADDED/
+Process.prototype.reportCube = function (a) {
+    return (+a * +a * +a);
+};
+
+
+
 Process.prototype.reportRandom = function (min, max) {
     var floor = +min,
         ceil = +max;

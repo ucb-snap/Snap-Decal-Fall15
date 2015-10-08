@@ -920,6 +920,11 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'operators',
             spec: '%n + %n'
         },
+        reportCube: {
+            type: 'reporter',
+            category: 'operators',
+            spec: '%n cubed'
+        },
         reportDifference: {
             type: 'reporter',
             category: 'operators',
@@ -1295,10 +1300,11 @@ SpriteMorph.prototype.blockAlternatives = {
     reportMouseY: ['reportMouseX'],
 
     // operators:
-    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient'],
-    reportDifference: ['reportSum', 'reportProduct', 'reportQuotient'],
-    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient'],
-    reportQuotient: ['reportDifference', 'reportProduct', 'reportSum'],
+    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient', 'reportCube'],
+    reportDifference: ['reportSum', 'reportProduct', 'reportQuotient', 'reportCube'],
+    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient', 'reportCube'],
+    reportQuotient: ['reportDifference', 'reportProduct', 'reportSum', 'reportCube'],
+    reportCube: ['reportDifference', 'reportProduct', 'reportQuotient', 'reportSum'],
     reportLessThan: ['reportEquals', 'reportGreaterThan'],
     reportEquals: ['reportLessThan', 'reportGreaterThan'],
     reportGreaterThan: ['reportEquals', 'reportLessThan'],
@@ -1977,6 +1983,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('#');
         blocks.push('-');
         blocks.push(block('reportSum'));
+        blocks.push(block('reportCube'));
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
@@ -5509,6 +5516,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push('#');
         blocks.push('-');
         blocks.push(block('reportSum'));
+        blocks.push(block('reportCube'));
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
