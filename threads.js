@@ -2002,7 +2002,6 @@ Process.prototype.reportTypeOf = function (thing) {
 };
 
 // Process math primtives
-
 Process.prototype.reportSum = function (a, b) {
     return +a + (+b);
 };
@@ -2017,6 +2016,10 @@ Process.prototype.reportProduct = function (a, b) {
 
 Process.prototype.reportQuotient = function (a, b) {
     return +a / +b;
+};
+// week 6: add an operator to snap! 
+Process.prototype.reportSquare= function (a) {
+    return +a * +a;
 };
 
 Process.prototype.reportModulus = function (a, b) {

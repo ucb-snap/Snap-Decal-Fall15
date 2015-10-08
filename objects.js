@@ -937,6 +937,12 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'operators',
             spec: '%n / %n' // '%n \u00F7 %n'
         },
+        // week 6 assignment: added square operator
+        reportSquare: {
+            type: 'reporter',
+            category: 'operators',
+            spec: 'square %n' // '%n \u00F7 %n'
+        },
         reportRound: {
             type: 'reporter',
             category: 'operators',
@@ -1295,10 +1301,12 @@ SpriteMorph.prototype.blockAlternatives = {
     reportMouseY: ['reportMouseX'],
 
     // operators:
-    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient'],
-    reportDifference: ['reportSum', 'reportProduct', 'reportQuotient'],
-    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient'],
-    reportQuotient: ['reportDifference', 'reportProduct', 'reportSum'],
+    // week 6 assignment: added math operator
+    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient', 'reportSquare'],
+    reportDifference: ['reportSum', 'reportProduct', 'reportQuotient', 'reportSquare'],
+    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient','reportSquare'],
+    reportQuotient: ['reportDifference', 'reportProduct', 'reportSum', 'reportSquare'],
+    reportSquare: ['reportSum','reportDifference', 'reportProduct', 'reportQuotient'],
     reportLessThan: ['reportEquals', 'reportGreaterThan'],
     reportEquals: ['reportLessThan', 'reportGreaterThan'],
     reportGreaterThan: ['reportEquals', 'reportLessThan'],
@@ -1980,6 +1988,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
+        // week 6 assignment: added math operator
+        blocks.push(block('reportSquare'));
         blocks.push('-');
         blocks.push(block('reportModulus'));
         blocks.push(block('reportRound'));
@@ -5512,6 +5522,8 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
+        // week 6 assignment: added math operator
+        blocks.push(block('reportSquare'));
         blocks.push('-');
         blocks.push(block('reportModulus'));
         blocks.push(block('reportRound'));
