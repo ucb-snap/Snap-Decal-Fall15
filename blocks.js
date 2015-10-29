@@ -3578,6 +3578,10 @@ CommandBlockMorph.prototype.snap = function () {
     scripts.clearDropHistory();
     scripts.lastDroppedBlock = this;
 
+    // EDITED: DEBUGGING PURPOSES ONLY
+    scripts.blockHistory.push(this);
+    // console.log(scripts.blockHistory + scripts.count); // debugging purposes only
+
     if (target === null) {
         this.startLayout();
         this.fixBlockColor();
@@ -4939,6 +4943,9 @@ ScriptsMorph.prototype.init = function (owner) {
     this.lastPreservedBlocks = null;
     this.lastNextBlock = null;
 
+    // edited: "undo adding block" attributes:
+    this.blockHistory = [];
+
     // keyboard editing support:
     this.focus = null;
 
@@ -5260,6 +5267,13 @@ ScriptsMorph.prototype.userMenu = function () {
     }
     menu.addItem('clean up', 'cleanUp', 'arrange scripts\nvertically');
     menu.addItem('add comment', 'addComment');
+    // Mini Project - EDITED: ADD UNDO FOR BLOCKS BEING DROPPED 
+    if (this.blockHistory.length > 0) {
+        menu.addItem(
+            'undo', 
+            'undoBlockDropped', 
+            'undo the drop\naction for the\nlast block');
+    }
     if (this.lastDroppedBlock) {
         menu.addItem(
             'undrop',
@@ -5366,6 +5380,14 @@ ScriptsMorph.prototype.addComment = function () {
     new CommentMorph().pickUp(this.world());
 };
 
+// Mini-Project - EDITED: Added function for undo-ing block dropping
+ScriptsMorph.prototype.undoBlockDropped = function() {
+    //console.log(this.blockHistory.length);        // debugging purposes
+    var block = this.blockHistory.pop();
+    //console.log(block);                           // debugging purposes
+    block.destroy();
+}
+
 ScriptsMorph.prototype.undrop = function () {
     if (!this.lastDroppedBlock) {return; }
     if (this.lastDroppedBlock instanceof CommandBlockMorph) {
@@ -5451,6 +5473,7 @@ ScriptsMorph.prototype.reactToDropOf = function (droppedMorph, hand) {
 // ScriptsMorph events
 
 ScriptsMorph.prototype.mouseClickLeft = function (pos) {
+    // edited: left clicking INSIDE the script box
     var shiftClicked = this.world().currentKey === 16;
     if (shiftClicked) {
         return this.edit(pos);

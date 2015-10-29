@@ -84,6 +84,9 @@ var SoundIconMorph;
 var JukeboxMorph;
 var StageHandleMorph;
 
+// EDITED: var keeping this temp instance to revert back to // for mini-project: version control attempt
+var temp;
+
 // Get the full url without "snap.html"
 var baseURL = (function getPath(location) {
     var origin, path, slash;
@@ -487,6 +490,7 @@ IDE_Morph.prototype.buildPanes = function () {
     this.createSpriteEditor();
     this.createCorralBar();
     this.createCorral();
+    this.temp = this;
 };
 
 IDE_Morph.prototype.createLogo = function () {
@@ -1232,13 +1236,14 @@ IDE_Morph.prototype.createSpriteBar = function () {
 
 IDE_Morph.prototype.createSpriteEditor = function () {
     // assumes that the logo pane and the stage have already been created
+
     var scripts = this.currentSprite.scripts,
         myself = this;
 
     if (this.spriteEditor) {
         this.spriteEditor.destroy();
     }
-
+    // EDITED : THIS IS THE SCRIPT EDITOR FRAME MORPH  // for mini-project: version control attempt
     if (this.currentTab === 'scripts') {
         scripts.isDraggable = false;
         scripts.color = this.groupColor;
@@ -1259,6 +1264,7 @@ IDE_Morph.prototype.createSpriteEditor = function () {
         this.add(this.spriteEditor);
         this.spriteEditor.scrollX(this.spriteEditor.padding);
         this.spriteEditor.scrollY(this.spriteEditor.padding);
+
     } else if (this.currentTab === 'costumes') {
         this.spriteEditor = new WardrobeMorph(
             this.currentSprite,
@@ -1270,7 +1276,7 @@ IDE_Morph.prototype.createSpriteEditor = function () {
 
         this.spriteEditor.acceptsDrops = false;
         this.spriteEditor.contents.acceptsDrops = false;
-    } else if (this.currentTab === 'sounds') {
+    } else if (this.currentTab === 'sounds') {   
         this.spriteEditor = new JukeboxMorph(
             this.currentSprite,
             this.sliderColor
@@ -1473,8 +1479,9 @@ IDE_Morph.prototype.fixLayout = function (situation) {
     // 'selectSprite' or 'refreshPalette' or 'tabEditor'
     var padding = this.padding;
 
+    // this is for changing the palette
     Morph.prototype.trackChanges = false;
-
+    
     if (situation !== 'refreshPalette') {
         // controlBar
         this.controlBar.setPosition(this.logo.topRight());
@@ -2471,6 +2478,8 @@ IDE_Morph.prototype.projectMenu = function () {
     menu.addLine();
     menu.addItem('New', 'createNewProject');
     menu.addItem('Open...', 'openProjectsBrowser');
+    // ADDED UNDO OPTION (UI) ONTO DROP DOWN SETTINGS MENU
+    menu.addItem('Undo', "undoLast");
     menu.addItem('Save', "save");
     if (shiftClicked) {
         menu.addItem(
@@ -2745,7 +2754,7 @@ IDE_Morph.prototype.aboutSnap = function () {
     }
     translations = localize('Translations') + '\n' + SnapTranslator.credits();
 
-    dlg = new DialogBoxMorph();
+    dlg = new DiaogBoxMorph();
     dlg.inform('About Snap', aboutTxt, world);
     btn1 = dlg.buttons.children[0];
     translatorsBtn = dlg.addButton(
@@ -2915,7 +2924,7 @@ IDE_Morph.prototype.newProject = function () {
 };
 
 IDE_Morph.prototype.save = function () {
-    if (this.source === 'examples') {
+    if (this.source === 'examples') { // edit: premade snap code 
         this.source = 'local'; // cannot save to examples
     }
     if (this.projectName) {
@@ -2928,6 +2937,13 @@ IDE_Morph.prototype.save = function () {
         this.saveProjectsBrowser();
     }
 };
+
+//PLEASE ADD IN THE UNDO FUNCTION INTO HERE
+// IDE_Morph.prototype.undoLast = function () {
+//     console.log("you are calling undo");
+//     var myself = this;
+//     myself = this.temp;
+// }
 
 
 IDE_Morph.prototype.saveProject = function (name) {
@@ -5601,6 +5617,7 @@ SpriteIconMorph.prototype.prepareToBeGrabbed = function () {
     var ide = this.parentThatIsA(IDE_Morph),
         idx;
     this.mouseClickLeft(); // select me
+    // Edit: the encapsulated sprite icon
     if (ide) {
         idx = ide.sprites.asArray().indexOf(this.object);
         ide.sprites.remove(idx + 1);
