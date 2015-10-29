@@ -1399,7 +1399,7 @@ Process.prototype.reportListItem = function (index, list) {
 };
 
 Process.prototype.reportListSort = function (list) {
-    
+
     //Quicksort ------------------------------------------
     function quicksort(array) {
         if (array.length === 0) {
@@ -1408,7 +1408,7 @@ Process.prototype.reportListSort = function (list) {
         var small = [];
         var big = [];
         var pivot = array[0];
-        for (var i = 1; i < array.length; i++) {
+        for(var i = 1; i < array.length; i++) {
             if (array[i] < pivot) {
                 small.push(array[i]);
             } else {
