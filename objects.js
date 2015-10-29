@@ -125,7 +125,7 @@ PrototypeHatBlockMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.objects = '2015-October-07';
+modules.objects = '2015-September-23';
 
 var SpriteMorph;
 var StageMorph;
@@ -449,6 +449,12 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'sound',
             spec: 'play sound %snd'
         },
+        piano: {
+            type: 'command',
+            category: 'sound',
+            spec: 'play key %s',
+            defaults: ['c']
+        },
         doPlaySoundUntilDone: {
             type: 'command',
             category: 'sound',
@@ -583,7 +589,7 @@ SpriteMorph.prototype.initBlocks = function () {
         },
 
     /* migrated to a newer block version:
-
+  
         receiveClick: {
             type: 'hat',
             category: 'control',
@@ -919,11 +925,6 @@ SpriteMorph.prototype.initBlocks = function () {
             type: 'reporter',
             category: 'operators',
             spec: '%n + %n'
-        },
-        reportSquare: {
-            type: 'reporter',
-            category: 'operators',
-            spec: '%n ^ 2'
         },
         reportDifference: {
             type: 'reporter',
@@ -1267,8 +1268,9 @@ SpriteMorph.prototype.blockAlternatives = {
     setScale: ['changeScale'],
 
     // sound:
-    playSound: ['doPlaySoundUntilDone'],
-    doPlaySoundUntilDone: ['playSound'],
+    playSound: ['doPlaySoundUntilDone', 'piano'],
+    piano: ['doPlaySoundUntilDone', 'playSound'],
+    doPlaySoundUntilDone: ['playSound', 'piano'],
     doChangeTempo: ['doSetTempo'],
     doSetTempo: ['doChangeTempo'],
 
@@ -1304,7 +1306,6 @@ SpriteMorph.prototype.blockAlternatives = {
     reportDifference: ['reportSum', 'reportProduct', 'reportQuotient'],
     reportProduct: ['reportDifference', 'reportSum', 'reportQuotient'],
     reportQuotient: ['reportDifference', 'reportProduct', 'reportSum'],
-    reportSquare: ['reportDifference', 'reportProduct', 'reportQuotient', 'reportSum'],
     reportLessThan: ['reportEquals', 'reportGreaterThan'],
     reportEquals: ['reportLessThan', 'reportGreaterThan'],
     reportGreaterThan: ['reportEquals', 'reportLessThan'],
@@ -1823,6 +1824,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
     } else if (cat === 'sound') {
 
         blocks.push(block('playSound'));
+        blocks.push(block('piano'));
         blocks.push(block('doPlaySoundUntilDone'));
         blocks.push(block('doStopAllSounds'));
         blocks.push('-');
@@ -1983,7 +1985,6 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('#');
         blocks.push('-');
         blocks.push(block('reportSum'));
-        blocks.push(block('reportSquare'));
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
@@ -2751,6 +2752,25 @@ SpriteMorph.prototype.addSound = function (audio, name) {
 };
 
 SpriteMorph.prototype.playSound = function (name) {
+    var stage = this.parentThatIsA(StageMorph),
+        sound = detect(
+            this.sounds.asArray(),
+            function (s) {return s.name === name; }
+        ),
+        active;
+    if (sound) {
+        active = sound.play();
+        if (stage) {
+            stage.activeSounds.push(active);
+            stage.activeSounds = stage.activeSounds.filter(function (aud) {
+                return !aud.ended && !aud.terminated;
+            });
+        }
+        return active;
+    }
+};
+
+SpriteMorph.prototype.piano = function (name) {
     var stage = this.parentThatIsA(StageMorph),
         sound = detect(
             this.sounds.asArray(),
@@ -3680,8 +3700,7 @@ SpriteMorph.prototype.allHatBlocksForKey = function (key) {
     return this.scripts.children.filter(function (morph) {
         if (morph.selector) {
             if (morph.selector === 'receiveKey') {
-                var evt = morph.inputs()[0].evaluate()[0];
-                return evt === key || evt === 'any';
+                return morph.inputs()[0].evaluate()[0] === key;
             }
         }
         return false;
@@ -4036,12 +4055,7 @@ SpriteMorph.prototype.paletteBlockInstance = function (definition) {
     );
 };
 
-SpriteMorph.prototype.usesBlockInstance = function (
-    definition,
-    forRemoval, // optional bool
-    skipGlobals, // optional bool
-    skipBlocks // optional array with ignorable definitions
-) {
+SpriteMorph.prototype.usesBlockInstance = function (definition) {
     var inDefinitions,
         inScripts = detect(
             this.scripts.allChildren(),
@@ -4051,24 +4065,6 @@ SpriteMorph.prototype.usesBlockInstance = function (
         );
 
     if (inScripts) {return true; }
-
-    if (definition.isGlobal && !skipGlobals) {
-        inDefinitions = [];
-        this.parentThatIsA(StageMorph).globalBlocks.forEach(
-            function (def) {
-                if (forRemoval && (definition === def)) {return; }
-                if (skipBlocks && contains(skipBlocks, def)) {return; }
-                if (def.body) {
-                    def.body.expression.allChildren().forEach(function (c) {
-                        if (c.definition && (c.definition === definition)) {
-                            inDefinitions.push(c);
-                        }
-                    });
-                }
-            }
-        );
-        if (inDefinitions.length > 0) {return true; }
-    }
 
     inDefinitions = [];
     this.customBlocks.forEach(function (def) {
@@ -5401,6 +5397,7 @@ StageMorph.prototype.blockTemplates = function (category) {
     } else if (cat === 'sound') {
 
         blocks.push(block('playSound'));
+        blocks.push(block('piano'));
         blocks.push(block('doPlaySoundUntilDone'));
         blocks.push(block('doStopAllSounds'));
         blocks.push('-');
@@ -5540,7 +5537,6 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push('#');
         blocks.push('-');
         blocks.push(block('reportSum'));
-        blocks.push(block('reportSquare'));
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
@@ -5937,6 +5933,9 @@ StageMorph.prototype.addSound
 
 StageMorph.prototype.playSound
     = SpriteMorph.prototype.playSound;
+
+StageMorph.prototype.piano
+    = SpriteMorph.prototype.piano;
 
 StageMorph.prototype.stopAllActiveSounds = function () {
     this.activeSounds.forEach(function (audio) {

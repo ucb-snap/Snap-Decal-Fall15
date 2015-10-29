@@ -83,7 +83,7 @@ ArgLabelMorph, localize, XML_Element, hex_sha512*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.threads = '2015-October-02';
+modules.threads = '2015-September-23';
 
 var ThreadManager;
 var Process;
@@ -1814,6 +1814,13 @@ Process.prototype.doPlaySoundUntilDone = function (name) {
     this.pushContext();
 };
 
+Process.prototype.piano = function (name) {
+    if (name.length > 0) {
+        var audio = new Audio('piano_keys/' + name + '.mp3');
+        audio.play();
+    }
+};
+
 Process.prototype.doStopAllSounds = function () {
     var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
     if (stage) {
@@ -2005,10 +2012,6 @@ Process.prototype.reportTypeOf = function (thing) {
 
 Process.prototype.reportSum = function (a, b) {
     return +a + (+b);
-};
-
-Process.prototype.reportSquare = function (a) {
-    return +a * +a;
 };
 
 Process.prototype.reportDifference = function (a, b) {
@@ -2640,9 +2643,6 @@ Process.prototype.reportKeyPressed = function (keyString) {
     if (this.homeContext.receiver) {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
         if (stage) {
-            if (this.inputOption(keyString) === 'any') {
-                return Object.keys(stage.keysPressed).length > 0;
-            }
             return stage.keysPressed[keyString] !== undefined;
         }
     }
