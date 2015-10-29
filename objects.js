@@ -5134,6 +5134,26 @@ StageMorph.prototype.fireKeyEvent = function (key) {
     if (evt === 'ctrl enter') {
         return this.fireGreenFlagEvent();
     }
+    if (evt === 'ctrl c'){
+    	return new CommentMorph().pickUp(this.world());
+    }
+    if (evt === 'ctrl g'){
+    	if (ide.getSetting('design') === 'flat'){
+    		ide.defaultDesign();
+    	}
+    	else{
+	    	ide.flatDesign();
+	    }
+    }
+    if (evt === 'ctrl u'){
+    	new ScriptsMorph().cleanUp();
+    }
+    if (evt === 'ctrl x'){
+    	return this.removeAllClones();
+    }
+    if (evt === 'ctrl b'){
+    	return this.clear();
+    }
     if (evt === 'shift enter') {
         return this.editScripts();
     }
