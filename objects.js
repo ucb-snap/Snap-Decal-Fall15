@@ -5145,9 +5145,6 @@ StageMorph.prototype.fireKeyEvent = function (key) {
 	    	ide.flatDesign();
 	    }
     }
-    if (evt === 'ctrl u'){
-    	new ScriptsMorph().cleanUp();
-    }
     if (evt === 'ctrl x'){
     	return this.removeAllClones();
     }
