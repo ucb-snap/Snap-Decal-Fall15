@@ -1137,6 +1137,11 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'lists',
             spec: 'all but first of %l'
         },
+        reportListSort: {
+            type: 'reporter',
+            category: 'lists',
+            spec: 'Sort %l'
+        },
         reportListLength: {
             type: 'reporter',
             category: 'lists',
@@ -2105,6 +2110,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportListItem'));
         blocks.push(block('reportCDR'));
         blocks.push('-');
+        blocks.push(block('reportListSort'));
         blocks.push(block('reportListLength'));
         blocks.push(block('reportListContainsItem'));
         blocks.push('-');
@@ -2221,6 +2227,7 @@ SpriteMorph.prototype.freshPalette = function (category) {
                         'reportCONS',
                         'reportListItem',
                         'reportCDR',
+                        'reportListSort',
                         'reportListLength',
                         'reportListContainsItem',
                         'doAddToList',
@@ -5620,6 +5627,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportListItem'));
         blocks.push(block('reportCDR'));
         blocks.push('-');
+        blocks.push(block('reportListSort'));
         blocks.push(block('reportListLength'));
         blocks.push(block('reportListContainsItem'));
         blocks.push('-');

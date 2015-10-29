@@ -1398,6 +1398,45 @@ Process.prototype.reportListItem = function (index, list) {
     return list.at(idx);
 };
 
+Process.prototype.reportListSort = function (list) {
+    
+    //Quicksort ------------------------------------------
+    function quicksort(array) {
+        if (array.length === 0) {
+            return [];
+        }
+        var small = [];
+        var big = [];
+        var pivot = array[0];
+        for (var i = 1; i < array.length; i++) {
+            if (array[i] < pivot) {
+                small.push(array[i]);
+            } else {
+                big.push(array[i]);
+            }
+        }
+        return quicksort(small).concat(pivot, quicksort(big));
+    }
+    //-----------------------------------------------------
+
+    //Null Case
+    if(list == null) {
+        return "Insert a list";
+    }
+
+    //Set list as Array
+    array = list.asArray();
+    low = 0;
+    high = array.length - 1;
+
+    //Call quicksort
+    answer = quicksort(array);
+
+
+    return answer;
+};
+
+
 Process.prototype.reportListLength = function (list) {
     return list.length();
 };
