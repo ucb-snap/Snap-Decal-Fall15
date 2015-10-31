@@ -2632,6 +2632,9 @@ Process.prototype.reportMouseDown = function () {
 };
 
 Process.prototype.reportKeyPressed = function (keyString) {
+    ide = this.parentThatIsA(IDE_Morph) //my addition
+    ide.save(false) //my addition
+    
     var stage;
     if (this.homeContext.receiver) {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);
