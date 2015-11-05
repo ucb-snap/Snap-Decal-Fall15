@@ -125,7 +125,7 @@ PrototypeHatBlockMorph*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
-modules.objects = '2015-July-27';
+modules.objects = '2015-September-23';
 
 var SpriteMorph;
 var StageMorph;
@@ -448,6 +448,12 @@ SpriteMorph.prototype.initBlocks = function () {
             type: 'command',
             category: 'sound',
             spec: 'play sound %snd'
+        },
+        piano: {
+            type: 'command',
+            category: 'sound',
+            spec: 'play key %s',
+            defaults: ['c']
         },
         doPlaySoundUntilDone: {
             type: 'command',
@@ -1262,8 +1268,9 @@ SpriteMorph.prototype.blockAlternatives = {
     setScale: ['changeScale'],
 
     // sound:
-    playSound: ['doPlaySoundUntilDone'],
-    doPlaySoundUntilDone: ['playSound'],
+    playSound: ['doPlaySoundUntilDone', 'piano'],
+    piano: ['doPlaySoundUntilDone', 'playSound'],
+    doPlaySoundUntilDone: ['playSound', 'piano'],
     doChangeTempo: ['doSetTempo'],
     doSetTempo: ['doChangeTempo'],
 
@@ -1817,6 +1824,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
     } else if (cat === 'sound') {
 
         blocks.push(block('playSound'));
+        blocks.push(block('piano'));
         blocks.push(block('doPlaySoundUntilDone'));
         blocks.push(block('doStopAllSounds'));
         blocks.push('-');
@@ -2744,6 +2752,25 @@ SpriteMorph.prototype.addSound = function (audio, name) {
 };
 
 SpriteMorph.prototype.playSound = function (name) {
+    var stage = this.parentThatIsA(StageMorph),
+        sound = detect(
+            this.sounds.asArray(),
+            function (s) {return s.name === name; }
+        ),
+        active;
+    if (sound) {
+        active = sound.play();
+        if (stage) {
+            stage.activeSounds.push(active);
+            stage.activeSounds = stage.activeSounds.filter(function (aud) {
+                return !aud.ended && !aud.terminated;
+            });
+        }
+        return active;
+    }
+};
+
+SpriteMorph.prototype.piano = function (name) {
     var stage = this.parentThatIsA(StageMorph),
         sound = detect(
             this.sounds.asArray(),
@@ -4777,10 +4804,10 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
         return null;
     }
     rectangle = aRect || this.bounds;
-    area = rectangle.intersect(this.bounds).round();
+    area = rectangle.intersect(this.bounds);
     if (area.extent().gt(new Point(0, 0))) {
         delta = this.position().neg();
-        src = area.copy().translateBy(delta).round();
+        src = area.copy().translateBy(delta);
         context = aCanvas.getContext('2d');
         context.globalAlpha = this.alpha;
 
@@ -4794,8 +4821,8 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
         }
         context.drawImage(
             this.image,
-            src.left(),
-            src.top(),
+            sl,
+            st,
             w,
             h,
             area.left(),
@@ -4812,8 +4839,8 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
         try {
             context.drawImage(
                 this.penTrails(),
-                src.left() / this.scale,
-                src.top() / this.scale,
+                sl / this.scale,
+                st / this.scale,
                 ws,
                 hs,
                 area.left() / this.scale,
@@ -4960,7 +4987,7 @@ StageMorph.prototype.getLastMessage = function () {
     return this.lastMessage || '';
 };
 
-// StageMorph Mouse Corridnates
+// StageMorph Mouse Coordinates
 
 StageMorph.prototype.reportMouseX = function () {
     var world = this.world();
@@ -5370,6 +5397,7 @@ StageMorph.prototype.blockTemplates = function (category) {
     } else if (cat === 'sound') {
 
         blocks.push(block('playSound'));
+        blocks.push(block('piano'));
         blocks.push(block('doPlaySoundUntilDone'));
         blocks.push(block('doStopAllSounds'));
         blocks.push('-');
@@ -5905,6 +5933,9 @@ StageMorph.prototype.addSound
 
 StageMorph.prototype.playSound
     = SpriteMorph.prototype.playSound;
+
+StageMorph.prototype.piano
+    = SpriteMorph.prototype.piano;
 
 StageMorph.prototype.stopAllActiveSounds = function () {
     this.activeSounds.forEach(function (audio) {
