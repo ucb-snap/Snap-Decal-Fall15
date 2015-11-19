@@ -649,6 +649,11 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'control',
             spec: 'if %b %c'
         },
+        debugBlock: {
+            type: 'command',
+            category: 'control',
+            spec: 'debug %c'
+        },
         doIfElse: {
             type: 'command',
             category: 'control',
@@ -1885,6 +1890,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('-');
         blocks.push(block('doIf'));
         blocks.push(block('doIfElse'));
+        blocks.push(block('debugBlock'));
         blocks.push('-');
         blocks.push(block('doReport'));
         blocks.push('-');

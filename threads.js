@@ -1423,6 +1423,10 @@ Process.prototype.doIf = function () {
     this.pushContext();
 };
 
+Process.prototype.debugBlock = function () {
+    
+};
+
 Process.prototype.doIfElse = function () {
     var args = this.context.inputs,
         outer = this.context.outerContext, // for tail call elimination
