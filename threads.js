@@ -489,7 +489,6 @@ Process.prototype.evaluateBlock = function (block, argCount) {
     if (contains(['reportOr', 'reportAnd', 'doReport'], block.selector)) {
         return this[block.selector](block);
     }
-
     // first evaluate all inputs, then apply the primitive
     var rcvr = this.context.receiver || this.topBlock.receiver(),
         inputs = this.context.inputs;
@@ -501,10 +500,18 @@ Process.prototype.evaluateBlock = function (block, argCount) {
             rcvr = this;
         }
         if (this.isCatchingErrors) {
+            //debug
+            console.log("Applying " + block.selector + " to the input: " + inputs);
+            //----------
             try {
+                result = rcvr[block.selector].apply(rcvr, inputs)
                 this.returnValueToParentContext(
-                    rcvr[block.selector].apply(rcvr, inputs)
+                    result
                 );
+                //debug
+                console.log("Result: " + result);
+                console.log("__step");
+                //----------
                 this.popContext();
             } catch (error) {
                 this.handleError(error, block);
@@ -784,7 +791,6 @@ Process.prototype.reify = function (topBlock, parameterNames, isCustomBlock) {
     context.inputs = parameterNames.asArray();
     context.receiver
         = this.context ? this.context.receiver : topBlock.receiver();
-
     return context;
 };
 
@@ -1423,8 +1429,11 @@ Process.prototype.doIf = function () {
     this.pushContext();
 };
 
-Process.prototype.debugBlock = function () {
-    
+Process.prototype.debugBlock = function (body) {
+    if (body) {
+        this.pushContext(body.blockSequence());
+    }
+    this.pushContext();
 };
 
 Process.prototype.doIfElse = function () {
