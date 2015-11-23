@@ -1418,6 +1418,17 @@ SyntaxElementMorph.prototype.labelPart = function (spec) {
                     new Point() : this.embossing;
             part.drawNew();
             break;
+        case '%step':
+            part = new SymbolMorph('step');
+            part.size = this.fontSize;
+            part.color = new Color(204, 102, 255);
+            console.log(part.color);
+            part.isProtectedLabel = true;
+            part.shadowColor = this.color.darker(this.labelContrast);
+            part.shadowOffset = MorphicPreferences.isFlat ?
+                    new Point() : this.embossing;
+            part.drawNew();
+            break; 
         default:
             nop();
         }
@@ -7974,6 +7985,7 @@ SymbolMorph.prototype.names = [
     'stage',
     'turtleOutline',
     'pause',
+    'step',
     'flag',
     'octagon',
     'cloud',
@@ -8106,6 +8118,8 @@ SymbolMorph.prototype.symbolCanvasColored = function (aColor) {
         return this.drawSymbolTurtleOutline(canvas, aColor);
     case 'pause':
         return this.drawSymbolPause(canvas, aColor);
+    case 'step':
+        return this.drawSymbolStep(canvas, aColor);
     case 'flag':
         return this.drawSymbolFlag(canvas, aColor);
     case 'octagon':
@@ -8443,6 +8457,14 @@ SymbolMorph.prototype.drawSymbolPause = function (canvas, color) {
     ctx.fillStyle = color.toString();
     ctx.fillRect(0, 0, w * 2, canvas.height);
     ctx.fillRect(w * 3, 0, w * 2, canvas.height);
+    return canvas;
+};
+
+SymbolMorph.prototype.drawSymbolStep = function (canvas, color) {
+    var ctx = canvas.getContext('2d'),
+        w = canvas.width / 2;
+    ctx.fillStyle = new Color(204, 102, 255).toString();
+    ctx.fillRect(0, 0, w * 3, canvas.height);
     return canvas;
 };
 
