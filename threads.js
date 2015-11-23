@@ -197,6 +197,7 @@ ThreadManager.prototype.stopProcess = function (block) {
 };
 
 ThreadManager.prototype.pauseAll = function (stage) {
+    debugging = false
     this.processes.forEach(function (proc) {
         proc.pause();
     });
@@ -456,7 +457,7 @@ Process.prototype.pauseStep = function () {
 };
 
 // Process evaluation
-
+var debugging = false
 Process.prototype.evaluateContext = function () {
     var exp = this.context.expression;
     this.frameCount += 1;
@@ -476,7 +477,7 @@ Process.prototype.evaluateContext = function () {
         return this.evaluateInput(exp);
     }
     if (exp instanceof BlockMorph) {
-        return this.evaluateBlock(exp, exp.inputs().length, true);
+        return this.evaluateBlock(exp, exp.inputs().length, debugging);
     }
     if (isString(exp)) {
         return this[exp]();
@@ -1435,6 +1436,8 @@ Process.prototype.doIf = function () {
 };
 
 Process.prototype.debugBlock = function (body) {
+    debugging = true
+    this.popContext();
     if (body) {
         this.pushContext(body.blockSequence());
     }
@@ -2844,6 +2847,7 @@ Process.prototype.inputOption = function (dta) {
 };
 
 // Process stack
+
 
 Process.prototype.pushContext = function (expression, outerContext) {
     this.context = new Context(
