@@ -476,7 +476,7 @@ Process.prototype.evaluateContext = function () {
         return this.evaluateInput(exp);
     }
     if (exp instanceof BlockMorph) {
-        return this.evaluateBlock(exp, exp.inputs().length);
+        return this.evaluateBlock(exp, exp.inputs().length, true);
     }
     if (isString(exp)) {
         return this[exp]();
@@ -484,7 +484,7 @@ Process.prototype.evaluateContext = function () {
     this.popContext(); // default: just ignore it
 };
 
-Process.prototype.evaluateBlock = function (block, argCount) {
+Process.prototype.evaluateBlock = function (block, argCount, debugging) {
     // check for special forms
     if (contains(['reportOr', 'reportAnd', 'doReport'], block.selector)) {
         return this[block.selector](block);
@@ -501,7 +501,9 @@ Process.prototype.evaluateBlock = function (block, argCount) {
         }
         if (this.isCatchingErrors) {
             //debug
-            console.log("Applying " + block.selector + " to the input: " + inputs);
+            if (debugging) {
+                console.log("Applying " + block.selector + " to the input: " + inputs);
+            }
             //----------
             try {
                 result = rcvr[block.selector].apply(rcvr, inputs)
@@ -509,8 +511,11 @@ Process.prototype.evaluateBlock = function (block, argCount) {
                     result
                 );
                 //debug
-                console.log("Result: " + result);
-                console.log("__step");
+                if (debugging) {
+                    console.log("Result: " + result);
+                    console.log("__step");
+                    this.pause();
+                }
                 //----------
                 this.popContext();
             } catch (error) {
