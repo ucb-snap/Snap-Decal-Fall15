@@ -83,6 +83,14 @@ ArgLabelMorph, localize, XML_Element, hex_sha512*/
 
 // Global stuff ////////////////////////////////////////////////////////
 
+
+var myVar = setInterval(saveTimer, 300000); //5 minutes
+function saveTimer() {
+    var ide = this.parentThatIsA(IDE_Morph) //save function 
+    ide.save(true)
+}
+
+
 modules.threads = '2015-July-27';
 
 var ThreadManager;
@@ -2621,6 +2629,9 @@ Process.prototype.reportMouseY = function () {
 };
 
 Process.prototype.reportMouseDown = function () {
+    ide = this.parentThatIsA(IDE_Morph) //my addition
+    ide.save(true)
+
     var world;
     if (this.homeContext.receiver) {
         world = this.homeContext.receiver.world();
@@ -2633,7 +2644,7 @@ Process.prototype.reportMouseDown = function () {
 
 Process.prototype.reportKeyPressed = function (keyString) {
     ide = this.parentThatIsA(IDE_Morph) //my addition
-    ide.save(false) //my addition
+    ide.save(true) //my addition
     
     var stage;
     if (this.homeContext.receiver) {
@@ -2646,6 +2657,8 @@ Process.prototype.reportKeyPressed = function (keyString) {
 };
 
 Process.prototype.doResetTimer = function () {
+    ide = this.parentThatIsA(IDE_Morph) //my addition
+    ide.save(true)
     var stage;
     if (this.homeContext.receiver) {
         stage = this.homeContext.receiver.parentThatIsA(StageMorph);

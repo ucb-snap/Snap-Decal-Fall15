@@ -2914,7 +2914,7 @@ IDE_Morph.prototype.newProject = function () {
     this.fixLayout();
 };
 
-IDE_Morph.prototype.save = function (ctrl_s) {
+IDE_Morph.prototype.saved = function (ctrl_s) {
     if (this.source === 'examples') {
         this.source = 'local'; // cannot save to examples
     }
