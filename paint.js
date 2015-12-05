@@ -76,6 +76,8 @@ modules.paint = '2015-June-25';
 var PaintEditorMorph;
 var PaintCanvasMorph;
 var PaintColorPickerMorph;
+var TextBoxMorph;
+var CrossHairsOn = false;
 
 // PaintEditorMorph //////////////////////////
 
@@ -86,6 +88,18 @@ PaintEditorMorph.prototype.constructor = PaintEditorMorph;
 PaintEditorMorph.uber = DialogBoxMorph.prototype;
 
 PaintEditorMorph.prototype.padding = 10;
+
+TextBoxMorph.prototype = new DialogBoxMorph();
+TextBoxMorph.prototype.constructor = TextBoxMorph;
+TextBoxMorph.uber = DialogBoxMorph.prototype;
+
+TextBoxMorph.prototype.padding = 10;
+
+function TextBoxMorph(ctx) {
+    var text = window.prompt("Please enter text.", "INPUT HERE");
+    PaintCanvasMorph.textToImage();
+
+}
 
 function PaintEditorMorph() {
     this.init();
@@ -168,7 +182,7 @@ PaintEditorMorph.prototype.buildToolbox = function () {
                 "Stroked Ellipse\n(shift: circle)",
             eraser:
                 "Eraser tool",
-            crosshairs:
+            crosshairs: //put text box here
                 "Set the rotation center",
 
             line:
@@ -180,7 +194,10 @@ PaintEditorMorph.prototype.buildToolbox = function () {
             paintbucket:
                 "Fill a region",
             pipette:
-                "Pipette tool\n(pick a color anywhere)"
+                "Pipette tool\n(pick a color anywhere)",
+
+            textbox:
+                "Text to image."
         },
         myself = this,
         left = this.toolbox.left(),
@@ -221,6 +238,10 @@ PaintEditorMorph.prototype.buildEdits = function () {
     this.edits.add(this.pushButton(
         "clear",
         function () {paper.clearCanvas(); }
+    ));
+    this.edits.add(this.pushButton(
+        "add text box",
+        function () {TextBoxMorph(this.paper); }
     ));
     this.edits.fixLayout();
 };
@@ -398,12 +419,20 @@ PaintEditorMorph.prototype.populatePropertiesMenu = function () {
         "Constrain proportions of shapes?\n(you can also hold shift)",
         function () {return myself.shift; }
     );
+    pc.crosshair = new ToggleMorph(
+        "checkbox",
+        this,
+        function () {CrossHairsOn = !CrossHairsOn; },
+        "Show crosshairs?",
+        function () {return CrossHairsOn; }
+    );
     c.add(pc.colorpicker);
     //c.add(pc.primaryColorButton);
     c.add(pc.primaryColorViewer);
     c.add(new TextMorph(localize("Brush size")));
     c.add(alpen);
     c.add(pc.constrain);
+    c.add(pc.crosshair);
 };
 
 PaintEditorMorph.prototype.toolButton = function (icon, hint) {
@@ -558,6 +587,7 @@ PaintCanvasMorph.uber = Morph.prototype;
 
 function PaintCanvasMorph(shift) {
     this.init(shift);
+    this.textToImage();
 }
 
 PaintCanvasMorph.prototype.init = function (shift) {
@@ -786,7 +816,12 @@ PaintCanvasMorph.prototype.mouseDownLeft = function (pos) {
     }
 };
 
+var count = 0;
+var text = "";
+
 PaintCanvasMorph.prototype.mouseMove = function (pos) {
+
+
     if (this.currentTool === "paintbucket") {
         return;
     }
@@ -827,6 +862,7 @@ PaintCanvasMorph.prototype.mouseMove = function (pos) {
     }
     switch (this.currentTool) {
     case "rectangle":
+        count = 0;
         if (this.isShiftPressed()) {
             mctx.strokeRect(x, y, newW() * 2, newH() * 2);
         } else {
@@ -834,13 +870,26 @@ PaintCanvasMorph.prototype.mouseMove = function (pos) {
         }
         break;
     case "rectangleSolid":
+        count = 0;
         if (this.isShiftPressed()) {
             mctx.fillRect(x, y, newW() * 2, newH() * 2);
         } else {
             mctx.fillRect(x, y, w * 2, h * 2);
         }
+
+        // mctx.font = "30px Arial";
+        // mctx.fillText("Hello world.", 10, 50);
+        break;
+    case "textbox":
+        if (count === 0) {
+            text = window.prompt("Please enter text.", "INPUT HERE");
+        }
+        mctx.font = "30px Arial";
+        mctx.fillText(text, x, y);
+        count++;
         break;
     case "brush":
+        count = 0;
         mctx.lineCap = "round";
         mctx.lineJoin = "round";
         mctx.beginPath();
@@ -851,6 +900,7 @@ PaintCanvasMorph.prototype.mouseMove = function (pos) {
         mctx.stroke();
         break;
     case "line":
+        count = 0;
         mctx.beginPath();
         mctx.moveTo(x, y);
         if (this.isShiftPressed()) {
@@ -866,6 +916,7 @@ PaintCanvasMorph.prototype.mouseMove = function (pos) {
         break;
     case "circle":
     case "circleSolid":
+        count = 0;
         mctx.beginPath();
         if (this.isShiftPressed()) {
             mctx.arc(
@@ -906,10 +957,12 @@ PaintCanvasMorph.prototype.mouseMove = function (pos) {
         }
         break;
     case "crosshairs":
+        count = 0;
         this.rotationCenter = relpos.copy();
         this.drawcrosshair(mctx);
         break;
     case "eraser":
+        count = 0;
         this.merge(this.paper, this.mask);
         mctx.save();
         mctx.globalCompositeOperation = "destination-out";
@@ -988,6 +1041,60 @@ PaintCanvasMorph.prototype.drawFrame = function () {
     this.cachedClrDark = borderColor.darker(this.contrast).toString();
     this.drawRectBorder(context);
 };
+
+// NEW FUNCTION! 
+PaintCanvasMorph.prototype.textToImage = function() {
+// PaintCanvasMorph.prototype.scale = function (x, y) {
+//     this.mask = newCanvas(this.extent());
+//     var c = newCanvas(this.extent());
+//     c.getContext("2d").save();
+//     c.getContext("2d").translate(
+//         this.rotationCenter.x,
+//         this.rotationCenter.y
+//     );
+//     c.getContext("2d").scale(1 + x, 1 + y);
+//     c.getContext("2d").drawImage(
+//         this.paper,
+//         -this.rotationCenter.x,
+//         -this.rotationCenter.y
+//     );
+//     c.getContext("2d").restore();
+//     this.paper = c;
+//     this.drawNew();
+//     this.changed();
+// };
+
+
+    var ctx = this.mask.getContext("2d");
+    ctx.rect(20,20,150,100);
+    ctx.fillStyle="red";
+    ctx.fill();
+
+
+    // c.fillStyle = 'black';
+    // ctx.fillText("hi", ctx.width/2, ctx.height/2);
+    // ctx.fillRect(0, 0, 150, 150);
+
+
+    // function sendToCanvas(ob) {
+    //     var img = new Image();
+    //     img.onload = function() {
+    //         ctx.drawImage(img, 0, 0);
+    //         ctx.font = ob.fontWeight + ' ' + ob.fontSize + ' ' + ob.fontFamily;
+    //         ctx.textAlign = "center";
+    //         ctx.fillStyle = "rgba(0, 0, 0, 0)";
+    //         ctx.fillText(ob.text, idk.width/2, idk.height/2);
+    //     }
+    // };
+
+    // sendToCanvas({
+    //     image : "Costumes/textbox.png",
+    //     text : text,
+    //     fontWeight : "bold",
+    //     fontSize : "30px",
+    //     fontFamily : "Arial"
+    // });
+}
 
 PaintCanvasMorph.prototype.drawRectBorder
     = InputFieldMorph.prototype.drawRectBorder;
