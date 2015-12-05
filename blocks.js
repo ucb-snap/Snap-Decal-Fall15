@@ -825,8 +825,16 @@ SyntaxElementMorph.prototype.labelPart = function (spec) {
             part.isDraggable = true;
             part.isStatic = true;
             break;
+
+        // JOIN WORDS STUFF HERE
         case '%words':
             part = new MultiArgMorph('%s', null, 0);
+            part.addInput(); // allow for default value setting
+            part.addInput(); // allow for default value setting
+            part.isStatic = false;
+            break;
+        case '%addargs':
+            part = new MultiArgMorph('%b', null, 0);
             part.addInput(); // allow for default value setting
             part.addInput(); // allow for default value setting
             part.isStatic = false;
@@ -2006,6 +2014,7 @@ BlockMorph.prototype.isCachingInputs = true;
 BlockMorph.prototype.zebraContrast = 40; // alternating color brightness
 
 // BlockMorph sound feedback:
+
 
 BlockMorph.prototype.snapSound = null;
 
