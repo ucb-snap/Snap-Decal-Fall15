@@ -2914,35 +2914,37 @@ IDE_Morph.prototype.newProject = function () {
     this.fixLayout();
 };
 
-IDE_Morph.prototype.save = function () {
+IDE_Morph.prototype.saved = function (ctrl_s) {
     if (this.source === 'examples') {
         this.source = 'local'; // cannot save to examples
     }
     if (this.projectName) {
         if (this.source === 'local') { // as well as 'examples'
-            this.saveProject(this.projectName);
+            this.saveProject(this.projectName, ctrl_s);
         } else { // 'cloud'
             this.saveProjectToCloud(this.projectName);
         }
     } else {
-        this.saveProjectsBrowser();
+        this.saveProjectsBrowser(ctrl_s);
     }
 };
 
-
-IDE_Morph.prototype.saveProject = function (name) {
+IDE_Morph.prototype.saveProject = function (name, ctrl_s) {
     var myself = this;
     this.nextSteps([
         function () {
-            myself.showMessage('Saving...');
+            if (ctrl_s)
+            {
+                myself.showMessage('Saving...');
+            }   
         },
         function () {
-            myself.rawSaveProject(name);
+            myself.rawSaveProject(name, ctrl_s);
         }
     ]);
 };
 
-IDE_Morph.prototype.rawSaveProject = function (name) {
+IDE_Morph.prototype.rawSaveProject = function (name, ctrl_s) {
     var str;
     if (name) {
         this.setProjectName(name);
@@ -2951,7 +2953,9 @@ IDE_Morph.prototype.rawSaveProject = function (name) {
                 localStorage['-snap-project-' + name]
                     = str = this.serializer.serialize(this.stage);
                 this.setURL('#open:' + str);
-                this.showMessage('Saved!', 1);
+                if (ctrl_s) {
+                    this.showMessage('Saved!', 1);
+                }
             } catch (err) {
                 this.showMessage('Save failed: ' + err);
             }
@@ -2959,7 +2963,9 @@ IDE_Morph.prototype.rawSaveProject = function (name) {
             localStorage['-snap-project-' + name]
                 = str = this.serializer.serialize(this.stage);
             this.setURL('#open:' + str);
-            this.showMessage('Saved!', 1);
+            if (ctrl_s) {
+                    this.showMessage('Saved!', 1);
+                }
         }
     }
 };
