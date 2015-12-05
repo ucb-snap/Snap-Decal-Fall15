@@ -538,18 +538,61 @@ Process.prototype.reportOr = function (block) {
 
 Process.prototype.reportAnd = function (block) {
     var inputs = this.context.inputs;
+    var input_count = inputs.length;
 
-    if (inputs.length < 1) {
+    if (input_count < 1) {
         this.evaluateNextInput(block);
     } else if (!inputs[0]) {
         this.returnValueToParentContext(false);
         this.popContext();
-    } else if (inputs.length < 2) {
+    } else if (input_count < 2) {
         this.evaluateNextInput(block);
     } else {
         this.returnValueToParentContext(inputs[1] === true);
         this.popContext();
     }
+};
+
+Process.prototype.reportMultiAnd = function (block) {
+    var inputs = this.context.inputs;
+    var input_count = inputs.length;
+    var value = true;
+    var i;
+    var all_inputs = inputs[0].contents;
+    if (input_count < 1) {
+        this.evaluateNextInput(block);
+    }
+    if (all_inputs.length == 0) {
+        value = false;
+        this.returnValueToParentContext(value);
+        this.popContext();
+    }
+    for (i = 0; i < all_inputs.length; i++) {
+        value = value && all_inputs[i];
+    }
+    this.returnValueToParentContext(value);
+    this.popContext();
+};
+
+Process.prototype.reportMultiOr = function (block) {
+    var inputs = this.context.inputs;
+    var input_count = inputs.length;
+    var value = false;
+    var i;
+    var all_inputs = inputs[0].contents;
+    if (input_count < 1) {
+        this.evaluateNextInput(block);
+    }
+    if (all_inputs.length == 0) {
+        value = false;
+        this.returnValueToParentContext(value);
+        this.popContext();
+    }
+    for (i = 0; i < all_inputs.length; i++) {
+        value = value || all_inputs[i];
+    }
+    this.returnValueToParentContext(value);
+    this.popContext();
 };
 
 Process.prototype.doReport = function (block) {
@@ -698,7 +741,6 @@ Process.prototype.evaluateNextInput = function (element) {
         args = element.inputs(),
         exp = args[nxt],
         outer = this.context.outerContext; // for tail call elimination
-
     if (exp.isUnevaluated) {
         if (exp.isUnevaluated === true || exp.isUnevaluated()) {
             // just return the input as-is
@@ -2019,15 +2061,18 @@ Process.prototype.reportQuotient = function (a, b) {
     return +a / +b;
 };
 
-Process.prototype.reportExponent = function (a, b) {
-	return Math.pow(a,b);
-};
-
 Process.prototype.reportModulus = function (a, b) {
     var x = +a,
         y = +b;
     return ((x % y) + y) % y;
 };
+
+/JUST ADDED/
+Process.prototype.reportCube = function (a) {
+    return (+a * +a * +a);
+};
+
+
 
 Process.prototype.reportRandom = function (min, max) {
     var floor = +min,
@@ -2199,7 +2244,7 @@ Process.prototype.reportJoin = function (a, b) {
     return x.concat(y);
 };
 
-Process.prototype.reportJoinWords = function (aList) {
+Process.prototypef= function (aList) {
     if (aList instanceof List) {
         return aList.asText();
     }

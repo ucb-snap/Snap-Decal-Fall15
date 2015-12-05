@@ -984,6 +984,16 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'operators',
             spec: '%b and %b'
         },
+        reportMultiAnd: {
+            type: 'predicate',
+            category: 'operators',
+            spec: 'and together %addargs'
+        },
+        reportMultiOr: {
+            type: 'predicate',
+            category: 'operators',
+            spec: 'or together %addargs'
+        },
         reportOr: {
             type: 'predicate',
             category: 'operators',
@@ -1308,8 +1318,10 @@ SpriteMorph.prototype.blockAlternatives = {
     reportLessThan: ['reportEquals', 'reportGreaterThan'],
     reportEquals: ['reportLessThan', 'reportGreaterThan'],
     reportGreaterThan: ['reportEquals', 'reportLessThan'],
-    reportAnd: ['reportOr'],
-    reportOr: ['reportAnd'],
+    reportAnd: ['reportOr', 'reportMultiAnd', 'reportMultiOr'],
+    reportOr: ['reportAnd', ' reportMultiAnd', 'reportMultiOr'],
+    reportMultiAnd: ['reportAnd', ' reportOr', 'reportMultiOr'],
+    reportMultiOr: ['reportAnd', ' reportOr', 'reportMultiAnd'],
     reportTrue: ['reportFalse'],
     reportFalse: ['reportTrue'],
 
@@ -1634,7 +1646,7 @@ SpriteMorph.prototype.blockForSelector = function (selector, setDefaults) {
         defaults = migration ? migration.inputs : info.defaults;
         block.defaults = defaults;
         inputs = block.inputs();
-        if (inputs[0] instanceof MultiArgMorph) {
+        if (inputs[0] instanceof MultiArgMorph)  {
             inputs[0].setContents(defaults);
             inputs[0].defaults = defaults;
         } else {
@@ -1999,6 +2011,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('-');
         blocks.push(block('reportAnd'));
         blocks.push(block('reportOr'));
+        blocks.push(block('reportMultiAnd'));
+        blocks.push(block('reportMultiOr'));
         blocks.push(block('reportNot'));
         blocks.push('-');
         blocks.push(block('reportTrue'));
@@ -5547,7 +5561,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportEquals'));
         blocks.push(block('reportGreaterThan'));
         blocks.push('-');
-        blocks.push(block('reportAnd'));
+        blocks.push(block('repor'));
         blocks.push(block('reportOr'));
         blocks.push(block('reportNot'));
         blocks.push('-');
