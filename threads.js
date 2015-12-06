@@ -197,6 +197,7 @@ ThreadManager.prototype.stopProcess = function (block) {
 };
 
 ThreadManager.prototype.pauseAll = function (stage) {
+    debugging = false
     this.processes.forEach(function (proc) {
         proc.pause();
     });
@@ -456,7 +457,7 @@ Process.prototype.pauseStep = function () {
 };
 
 // Process evaluation
-
+var debugging = false
 Process.prototype.evaluateContext = function () {
     var exp = this.context.expression;
     this.frameCount += 1;
@@ -476,7 +477,7 @@ Process.prototype.evaluateContext = function () {
         return this.evaluateInput(exp);
     }
     if (exp instanceof BlockMorph) {
-        return this.evaluateBlock(exp, exp.inputs().length);
+        return this.evaluateBlock(exp, exp.inputs().length, debugging);
     }
     if (isString(exp)) {
         return this[exp]();
@@ -484,12 +485,11 @@ Process.prototype.evaluateContext = function () {
     this.popContext(); // default: just ignore it
 };
 
-Process.prototype.evaluateBlock = function (block, argCount) {
+Process.prototype.evaluateBlock = function (block, argCount, debugging) {
     // check for special forms
     if (contains(['reportOr', 'reportAnd', 'doReport'], block.selector)) {
         return this[block.selector](block);
     }
-
     // first evaluate all inputs, then apply the primitive
     var rcvr = this.context.receiver || this.topBlock.receiver(),
         inputs = this.context.inputs;
@@ -501,10 +501,23 @@ Process.prototype.evaluateBlock = function (block, argCount) {
             rcvr = this;
         }
         if (this.isCatchingErrors) {
+            //debug
+            if (debugging) {
+                console.log("Applying " + block.selector + " to the input: " + inputs);
+            }
+            //----------
             try {
+                result = rcvr[block.selector].apply(rcvr, inputs)
                 this.returnValueToParentContext(
-                    rcvr[block.selector].apply(rcvr, inputs)
+                    result
                 );
+                //debug
+                if (debugging) {
+                    console.log("Result: " + result);
+                    console.log("__step");
+                    this.pause();
+                }
+                //----------
                 this.popContext();
             } catch (error) {
                 this.handleError(error, block);
@@ -784,7 +797,6 @@ Process.prototype.reify = function (topBlock, parameterNames, isCustomBlock) {
     context.inputs = parameterNames.asArray();
     context.receiver
         = this.context ? this.context.receiver : topBlock.receiver();
-
     return context;
 };
 
@@ -1419,6 +1431,15 @@ Process.prototype.doIf = function () {
             this.pushContext(args[1].blockSequence(), outer);
             this.context.isCustomBlock = isCustomBlock;
         }
+    }
+    this.pushContext();
+};
+
+Process.prototype.debugBlock = function (body) {
+    debugging = true
+    this.popContext();
+    if (body) {
+        this.pushContext(body.blockSequence());
     }
     this.pushContext();
 };
@@ -2826,6 +2847,7 @@ Process.prototype.inputOption = function (dta) {
 };
 
 // Process stack
+
 
 Process.prototype.pushContext = function (expression, outerContext) {
     this.context = new Context(

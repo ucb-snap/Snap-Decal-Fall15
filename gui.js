@@ -542,6 +542,7 @@ IDE_Morph.prototype.createControlBar = function () {
         button,
         stopButton,
         pauseButton,
+        stepButton,
         startButton,
         projectButton,
         settingsButton,
@@ -686,6 +687,37 @@ IDE_Morph.prototype.createControlBar = function () {
     this.controlBar.add(pauseButton);
     this.controlBar.pauseButton = pauseButton; // for refreshing
 
+    //stepButton
+    button = new ToggleButtonMorph(
+        null,
+        myself,
+        'togglePauseResume',
+        [
+            new SymbolMorph('step', 12),
+            new SymbolMorph('step', 12)
+        ],
+        function () {
+            return myself.isPaused();
+        }
+    );
+
+    button.corner = 12;
+    button.color = colors[0];
+    button.highlightColor = colors[1];
+    button.pressColor = colors[2];
+    button.labelMinExtent = new Point(36, 18);
+    button.padding = 0;
+    button.labelShadowOffset = new Point(-1, -1);
+    button.labelShadowColor = colors[1];
+    button.labelColor = new Color(255, 220, 0);
+    button.contrast = this.buttonContrast;
+    button.drawNew();
+    button.fixLayout();
+    button.refresh();
+    stepButton = button;
+    this.controlBar.add(stepButton);
+    this.controlBar.stepButton = stepButton;
+
     // startButton
     button = new PushButtonMorph(
         this,
@@ -782,7 +814,7 @@ IDE_Morph.prototype.createControlBar = function () {
 
     this.controlBar.fixLayout = function () {
         x = this.right() - padding;
-        [stopButton, pauseButton, startButton].forEach(
+        [stepButton, stopButton, pauseButton, startButton].forEach(
             function (button) {
                 button.setCenter(myself.controlBar.center());
                 button.setRight(x);
