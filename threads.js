@@ -90,6 +90,18 @@ var Process;
 var Context;
 var VariableFrame;
 
+var mCol = 'rgba(74,108,212,1)'
+var loCol = 'rgba(143,86,227,1)'
+var sCol = 'rgba(207,74,217,1)'
+var pCol = 'rgba(0,161,120,1)'
+var cCol = 'rgba(230,168,34,1)'
+var sCol = 'rgba(4,148,220,1)'
+var opCol = 'rgba(98,194,19,1)'
+var vCol = 'rgba(243,118,29,1)'
+var liCol = 'rgba(217,77,17,1)'
+var otCol = 'rgba(150,150,150,1)'
+
+
 function snapEquals(a, b) {
     if (a instanceof List || (b instanceof List)) {
         if (a instanceof List && (b instanceof List)) {
@@ -486,6 +498,9 @@ Process.prototype.evaluateContext = function () {
 
 Process.prototype.evaluateBlock = function (block, argCount) {
     // check for special forms
+    var clr = SpriteMorph.prototype.blockColor[block.category];
+    var bc = block.color
+    
     if (contains(['reportOr', 'reportAnd', 'doReport'], block.selector)) {
         return this[block.selector](block);
     }
@@ -494,7 +509,7 @@ Process.prototype.evaluateBlock = function (block, argCount) {
     var rcvr = this.context.receiver || this.topBlock.receiver(),
         inputs = this.context.inputs;
 
-    if (argCount > inputs.length) {
+    if (argCount > inputs.length && bc == clr) {
         this.evaluateNextInput(block);
     } else {
         if (this[block.selector]) {

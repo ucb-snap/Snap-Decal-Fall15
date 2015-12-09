@@ -140,6 +140,8 @@ var WatcherMorph;
 var StagePrompterMorph;
 var Note;
 var SpriteHighlightMorph;
+//--------------------------Disable--------------
+var disable = false;
 
 // SpriteMorph /////////////////////////////////////////////////////////
 
@@ -177,7 +179,9 @@ SpriteMorph.prototype.blockColor = {
     operators : new Color(98, 194, 19),
     variables : new Color(243, 118, 29),
     lists : new Color(217, 77, 17),
-    other: new Color(150, 150, 150)
+    other: new Color(150, 150, 150),
+    //--------------Disable-------------------
+    disable : new Color(0, 0, 0)
 };
 
 SpriteMorph.prototype.paletteColor = new Color(55, 55, 55);
@@ -201,7 +205,6 @@ SpriteMorph.prototype.bubbleMaxTextWidth = 130;
 
 SpriteMorph.prototype.initBlocks = function () {
     SpriteMorph.prototype.blocks = {
-
         // Motion
         forward: {
             only: SpriteMorph,
@@ -213,6 +216,7 @@ SpriteMorph.prototype.initBlocks = function () {
         turn: {
             only: SpriteMorph,
             type: 'command',
+            //------------Disable------------------
             category: 'motion',
             spec: 'turn %clockwise %n degrees',
             defaults: [15]
@@ -3445,7 +3449,7 @@ SpriteMorph.prototype.setPosition = function (aPoint, justMe) {
 
 SpriteMorph.prototype.forward = function (steps) {
     var dest,
-        dist = steps * this.parent.scale || 0;
+    dist = steps * this.parent.scale || 0;
 
     if (dist >= 0) {
         dest = this.position().distanceAngle(dist, this.heading);
@@ -3453,7 +3457,7 @@ SpriteMorph.prototype.forward = function (steps) {
         dest = this.position().distanceAngle(
             Math.abs(dist),
             (this.heading - 180)
-        );
+            );
     }
     this.setPosition(dest);
     this.positionTalkBubble();
@@ -3494,6 +3498,7 @@ SpriteMorph.prototype.faceToXY = function (x, y) {
 };
 
 SpriteMorph.prototype.turn = function (degrees) {
+//---------------------Disable----------------------
     this.setHeading(this.heading + (+degrees || 0));
 };
 
@@ -3694,7 +3699,7 @@ SpriteMorph.prototype.allHatBlocksForInteraction = function (interaction) {
 // SpriteMorph events
 
 SpriteMorph.prototype.mouseClickLeft = function () {
-    return this.receiveUserInteraction('clicked');
+    //return this.receiveUserInteraction('clicked');
 };
 
 SpriteMorph.prototype.mouseEnter = function () {

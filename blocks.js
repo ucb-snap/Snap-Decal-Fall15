@@ -2270,6 +2270,15 @@ BlockMorph.prototype.userMenu = function () {
         }
     }
 
+//--------------------Disable–------------------
+    menu.addItem(
+        "disable",
+        function () {
+            myself.alternateBlockColor();
+        }
+    );
+//----------------------------------------------
+
     menu.addItem(
         "duplicate",
         function () {
@@ -3197,7 +3206,13 @@ BlockMorph.prototype.mouseClickLeft = function () {
     if (receiver) {
         stage = receiver.parentThatIsA(StageMorph);
         if (stage) {
-            stage.threads.toggleProcess(top);
+            var clr = SpriteMorph.prototype.blockColor[this.category];
+
+            if (this.color.eq(clr)) {
+                stage.threads.toggleProcess(top, 0);
+            } else {
+                stage.threads.toggleProcess(top, 1);
+            }
         }
     }
 };
