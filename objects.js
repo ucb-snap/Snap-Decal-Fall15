@@ -932,6 +932,11 @@ SpriteMorph.prototype.initBlocks = function () {
             spec: '%n \u00D7 %n',
             alias: '*'
         },
+        reportExponent: {
+        	type: 'reporter',
+        	category: 'operators',
+        	spec: '%n ^ %n',
+        },
         reportQuotient: {
             type: 'reporter',
             category: 'operators',
@@ -978,6 +983,16 @@ SpriteMorph.prototype.initBlocks = function () {
             type: 'predicate',
             category: 'operators',
             spec: '%b and %b'
+        },
+        reportMultiAnd: {
+            type: 'predicate',
+            category: 'operators',
+            spec: 'and together %addargs'
+        },
+        reportMultiOr: {
+            type: 'predicate',
+            category: 'operators',
+            spec: 'or together %addargs'
         },
         reportOr: {
             type: 'predicate',
@@ -1295,15 +1310,18 @@ SpriteMorph.prototype.blockAlternatives = {
     reportMouseY: ['reportMouseX'],
 
     // operators:
-    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient'],
+    reportSum: ['reportDifference', 'reportProduct', 'reportQuotient','reportExponent'],
     reportDifference: ['reportSum', 'reportProduct', 'reportQuotient'],
-    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient'],
+    reportProduct: ['reportDifference', 'reportSum', 'reportQuotient','reportExponent'],
     reportQuotient: ['reportDifference', 'reportProduct', 'reportSum'],
+    reportExponent: ['reportSum','reportProduct'],
     reportLessThan: ['reportEquals', 'reportGreaterThan'],
     reportEquals: ['reportLessThan', 'reportGreaterThan'],
     reportGreaterThan: ['reportEquals', 'reportLessThan'],
-    reportAnd: ['reportOr'],
-    reportOr: ['reportAnd'],
+    reportAnd: ['reportOr', 'reportMultiAnd', 'reportMultiOr'],
+    reportOr: ['reportAnd', ' reportMultiAnd', 'reportMultiOr'],
+    reportMultiAnd: ['reportAnd', ' reportOr', 'reportMultiOr'],
+    reportMultiOr: ['reportAnd', ' reportOr', 'reportMultiAnd'],
     reportTrue: ['reportFalse'],
     reportFalse: ['reportTrue'],
 
@@ -1628,7 +1646,7 @@ SpriteMorph.prototype.blockForSelector = function (selector, setDefaults) {
         defaults = migration ? migration.inputs : info.defaults;
         block.defaults = defaults;
         inputs = block.inputs();
-        if (inputs[0] instanceof MultiArgMorph) {
+        if (inputs[0] instanceof MultiArgMorph)  {
             inputs[0].setContents(defaults);
             inputs[0].defaults = defaults;
         } else {
@@ -1980,6 +1998,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
+        blocks.push(block('reportExponent'));
         blocks.push('-');
         blocks.push(block('reportModulus'));
         blocks.push(block('reportRound'));
@@ -1992,6 +2011,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('-');
         blocks.push(block('reportAnd'));
         blocks.push(block('reportOr'));
+        blocks.push(block('reportMultiAnd'));
+        blocks.push(block('reportMultiOr'));
         blocks.push(block('reportNot'));
         blocks.push('-');
         blocks.push(block('reportTrue'));
@@ -5127,6 +5148,23 @@ StageMorph.prototype.fireKeyEvent = function (key) {
     if (evt === 'ctrl enter') {
         return this.fireGreenFlagEvent();
     }
+    if (evt === 'ctrl c'){
+    	return new CommentMorph().pickUp(this.world());
+    }
+    if (evt === 'ctrl g'){
+    	if (ide.getSetting('design') === 'flat'){
+    		ide.defaultDesign();
+    	}
+    	else{
+	    	ide.flatDesign();
+	    }
+    }
+    if (evt === 'ctrl x'){
+    	return this.removeAllClones();
+    }
+    if (evt === 'ctrl b'){
+    	return this.clear();
+    }
     if (evt === 'shift enter') {
         return this.editScripts();
     }
@@ -5512,6 +5550,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDifference'));
         blocks.push(block('reportProduct'));
         blocks.push(block('reportQuotient'));
+        blocks.push(block('reportExponent'));
         blocks.push('-');
         blocks.push(block('reportModulus'));
         blocks.push(block('reportRound'));
@@ -5522,7 +5561,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportEquals'));
         blocks.push(block('reportGreaterThan'));
         blocks.push('-');
-        blocks.push(block('reportAnd'));
+        blocks.push(block('repor'));
         blocks.push(block('reportOr'));
         blocks.push(block('reportNot'));
         blocks.push('-');
